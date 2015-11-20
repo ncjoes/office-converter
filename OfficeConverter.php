@@ -18,7 +18,7 @@ class OfficeConverter {
 		if ( !$this->isFilename() ){
 			$this->path = dirname($this->filename).DIRECTORY_SEPARATOR;
 			$this->filename = basename($this->filename);
-			if ( substr($this->path, 0, 1) === DIRECTORY_SEPARATOR);{
+			if ( substr($this->path, 0, 1) !== DIRECTORY_SEPARATOR){
 				$this->path = $this->getCallerPath().DIRECTORY_SEPARATOR.$this->path;
 			}
 		} else {
