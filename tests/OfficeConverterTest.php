@@ -29,15 +29,15 @@ class OfficeConverterTest extends PHPUnit_Framework_TestCase
 
     public function testDocxToPdfConversion()
     {
-        $this->converter->convertTo('test1.pdf');
+        $output = $this->converter->convertTo('result1.pdf');
 
-        $this->assertFileExists($this->outDir.'\test1.pdf');
+        $this->assertFileExists($output);
     }
 
     public function testDocxToHtmlConversion()
     {
-        $this->converter->convertTo('test1.html');
+        $output = $this->converter->convertTo('result1.html');
 
-        $this->assertFileExists($this->outDir.'\test1.html');
+        $this->assertFileExists($output);
     }
 }

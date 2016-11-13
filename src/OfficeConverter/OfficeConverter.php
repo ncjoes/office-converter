@@ -2,6 +2,11 @@
 
 namespace NcJoes\OfficeConverter;
 
+/**
+ * Class OfficeConverter
+ *
+ * @package NcJoes\OfficeConverter
+ */
 class OfficeConverter
 {
     private $file;
@@ -10,10 +15,69 @@ class OfficeConverter
     private $extension;
     private $basename;
 
+    /**
+     * OfficeConverter constructor.
+     *
+     * @param $filename
+     * @param null $tempPath
+     * @param string $bin
+     */
     public function __construct($filename, $tempPath = null, $bin = 'soffice')
     {
-        $this->file = $this->open($filename);
+        if ($this->open($filename)) {
+            $this->setup($tempPath, $bin);
+        }
+    }
+
+    /**
+     * @param $filename
+     *
+     * @return null|string
+     * @throws OfficeConverterException
+     */
+    public function convertTo($filename)
+    {
+        $outputExtension = pathinfo($filename, PATHINFO_EXTENSION);
+        $supportedExtensions = $this->getAllowedConverter($this->extension);
+
+        if (!in_array($outputExtension, $supportedExtensions)) {
+            throw new OfficeConverterException("Output extension({$outputExtension}) not supported for input file({$this->basename})");
+        }
+
+        $outdir = $this->tempPath;
+        shell_exec($this->makeCommand($outdir, $outputExtension));
+
+        return $this->prepOutput($outdir, $filename, $outputExtension);
+    }
+
+    /**
+     * @param $filename
+     *
+     * @return bool
+     * @throws OfficeConverterException
+     */
+    protected function open($filename)
+    {
+        if (!file_exists($filename)) {
+            throw new OfficeConverterException('File does not exist --'.$filename);
+        }
+        $this->file = realpath($filename);
+
+        return true;
+    }
+
+    /**
+     * @param $tempPath
+     * @param $bin
+     *
+     * @throws OfficeConverterException
+     */
+    protected function setup($tempPath, $bin)
+    {
+        //basename
         $this->basename = pathinfo($this->file, PATHINFO_BASENAME);
+
+        //extension
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
 
         //Check for valid input file extension
@@ -26,36 +90,57 @@ class OfficeConverter
         if (!is_dir($tempPath)) {
             $tempPath = dirname($this->file);
         }
-        $this->tempPath = $tempPath;
+        $this->tempPath = realpath($tempPath);
 
         //binary location
         $this->bin = $bin;
     }
 
-    protected function open($filename)
+    /**
+     * @param $outputDirectory
+     * @param $outputExtension
+     *
+     * @return string
+     */
+    protected function makeCommand($outputDirectory, $outputExtension)
     {
-        if (!file_exists($filename)) {
-            throw new OfficeConverterException('File does not exist --'.$filename);
-        }
-
-        return realpath($filename);
-    }
-
-    public function convertTo($filename)
-    {
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        $allowedExt = $this->getAllowedConverter($this->extension);
-
-        if (!in_array($ext, $allowedExt)) {
-            throw new OfficeConverterException("Output extension({$ext}) not supported for input file({$this->basename})");
-        }
-
         $oriFile = escapeshellarg($this->file);
-        $outdir = escapeshellarg($this->tempPath);
-        $cmd = "{$this->bin} --headless -convert-to {$ext} {$oriFile} -outdir {$outdir}";
-        shell_exec($cmd);
+        $outputDirectory = escapeshellarg($outputDirectory);
+        if (PHP_OS === 'WINNT') {
+            $cmd = "{$this->bin} --headless -convert-to {$outputExtension} {$oriFile} -outdir {$outputDirectory}";
+        }
+        else {
+            $cmd = "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory}";
+        }
+
+        return $cmd;
     }
 
+    /**
+     * @param $outdir
+     * @param $filename
+     * @param $outputExtension
+     *
+     * @return null|string
+     */
+    protected function prepOutput($outdir, $filename, $outputExtension)
+    {
+        $tmpName = str_replace($this->extension, '', $this->basename).$outputExtension;
+        if (rename($outdir.'\\'.$tmpName, $outdir.'\\'.$filename)) {
+            return $outdir.'\\'.$filename;
+        }
+        elseif (is_file($outdir.'\\'.$tmpName)) {
+            return $outdir.'\\'.$tmpName;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param null $extension
+     *
+     * @return array|mixed
+     */
     private function getAllowedConverter($extension = null)
     {
         $allowedConverter = [
