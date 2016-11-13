@@ -11,17 +11,33 @@ use NcJoes\OfficeConverter\OfficeConverter;
 
 class OfficeConverterTest extends PHPUnit_Framework_TestCase
 {
+    /**
+     * @var OfficeConverter $converter
+     */
+    private $converter;
+    private $outDir;
+
     public function setUp()
     {
         parent::setUp();
+
+        $file = __DIR__.'\sources\test1.docx';
+        $this->outDir = __DIR__.'\results';
+
+        $this->converter = new OfficeConverter($file, $this->outDir);
     }
 
     public function testDocxToPdfConversion()
     {
-        $file = __DIR__.'\sources\test1.docx';
-        $converter = new OfficeConverter($file);
-        $result = $converter->convertTo('test1.pdf');
+        $this->converter->convertTo('test1.pdf');
 
-        $this->assertTrue(is_file($file));
+        $this->assertFileExists($this->outDir.'\test1.pdf');
+    }
+
+    public function testDocxToHtmlConversion()
+    {
+        $this->converter->convertTo('test1.html');
+
+        $this->assertFileExists($this->outDir.'\test1.html');
     }
 }
