@@ -5,81 +5,55 @@ namespace NcJoes\OfficeConverter;
 class OfficeConverter
 {
     private $file;
-    private $filename;
-    private $extension;
-    private $path;
     private $bin;
     private $tempPath;
+    private $extension;
+    private $basename;
 
-    public function __construct($filename, $bin = 'libreoffice', $tempPath = '/results')
+    public function __construct($filename, $tempPath = null, $bin = 'soffice')
     {
-        $this->bin = $bin;
+        $this->file = $this->open($filename);
+        $this->basename = pathinfo($this->file, PATHINFO_BASENAME);
+        $extension = pathinfo($this->file, PATHINFO_EXTENSION);
+
+        //Check for valid input file extension
+        if (!array_key_exists($extension, $this->getAllowedConverter())) {
+            throw new OfficeConverterException('Input file extension not supported -- '.$extension);
+        }
+        $this->extension = $extension;
+
+        //setup output path
+        if (!is_dir($tempPath)) {
+            $tempPath = dirname($this->file);
+        }
         $this->tempPath = $tempPath;
 
-        $this->filename = $filename;
-        $this->extension = pathinfo($filename, PATHINFO_EXTENSION);
+        //binary location
+        $this->bin = $bin;
+    }
 
-        if (!$this->isFilename()) {
-            $this->path = dirname($this->filename).DIRECTORY_SEPARATOR;
-            $this->filename = basename($this->filename);
-            if (substr($this->path, 0, 1) !== DIRECTORY_SEPARATOR) {
-                $this->path = $this->getCallerPath().DIRECTORY_SEPARATOR.$this->path;
-            }
-        }
-        else {
-            $this->path = $this->getCallerPath().DIRECTORY_SEPARATOR;
+    protected function open($filename)
+    {
+        if (!file_exists($filename)) {
+            throw new OfficeConverterException('File does not exist --'.$filename);
         }
 
-        $this->file = $this->path.$this->filename;
-        if (!file_exists($this->file)) {
-            throw new \Exception('File not exist --'.$this->file);
-        }
+        return realpath($filename);
     }
 
     public function convertTo($filename)
     {
         $ext = pathinfo($filename, PATHINFO_EXTENSION);
         $allowedExt = $this->getAllowedConverter($this->extension);
-        $path = $this->getCallerPath().DIRECTORY_SEPARATOR.dirname($filename).DIRECTORY_SEPARATOR;
-        $filename = basename($filename);
-        $oriFilename = str_replace('.'.$this->extension, '.'.$ext, $this->filename);
-        $file = $path.$filename;
+
         if (!in_array($ext, $allowedExt)) {
-            throw new Exception('File extension not supported');
+            throw new OfficeConverterException("Output extension({$ext}) not supported for input file({$this->basename})");
         }
+
         $oriFile = escapeshellarg($this->file);
-        $cmd = "{$this->bin} --headless --convert-to {$ext} --outdir {$this->tempPath} {$oriFile} 2>&1";
-        exec($cmd, $result, $returnVar);
-        if ($returnVar !== 0) {
-            $result = implode(' ', $result);
-            throw new Exception("{$cmd} command cant run. {$result}. Error code: {$returnVar}");
-
-            return false;
-        }
-        try {
-            if (rename($this->tempPath.DIRECTORY_SEPARATOR.$oriFilename, $file)) {
-                return true;
-            }
-        }
-        catch (Exception $e) {
-        }
-
-        return false;
-    }
-
-    public function toArray()
-    {
-        return [
-            'file' => $this->file,
-            'filename' => $this->filename,
-            'extension' => $this->extension,
-            'path' => $this->path,
-        ];
-    }
-
-    private function isFilename()
-    {
-        return basename($this->filename) === $this->filename;
+        $outdir = escapeshellarg($this->tempPath);
+        $cmd = "{$this->bin} --headless -convert-to {$ext} {$oriFile} -outdir {$outdir}";
+        shell_exec($cmd);
     }
 
     private function getAllowedConverter($extension = null)
@@ -88,11 +62,12 @@ class OfficeConverter
             'pptx' => ['pdf'],
             'ppt' => ['pdf'],
             'pdf' => ['pdf'],
-            'docx' => ['pdf', 'odt'],
-            'doc' => ['pdf', 'odt'],
+            'docx' => ['pdf', 'odt', 'html'],
+            'doc' => ['pdf', 'odt', 'html'],
             'xlsx' => ['pdf'],
             'xls' => ['pdf'],
         ];
+
         if ($extension !== null) {
             if (isset($allowedConverter[ $extension ])) {
                 return $allowedConverter[ $extension ];
@@ -102,15 +77,5 @@ class OfficeConverter
         }
 
         return $allowedConverter;
-    }
-
-    private function getCallerPath()
-    {
-        $trace = debug_backtrace();
-        if (empty($trace) || !isset($trace[1]) || !isset($trace[1]['file'])) {
-            return null;
-        }
-
-        return dirname($trace[1]['file']);
     }
 }
