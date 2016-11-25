@@ -22,7 +22,7 @@ class OfficeConverter
      * @param null $tempPath
      * @param string $bin
      */
-    public function __construct($filename, $tempPath = null, $bin = 'soffice')
+    public function __construct($filename, $tempPath = null, $bin = 'libreoffice')
     {
         if ($this->open($filename)) {
             $this->setup($tempPath, $bin);
@@ -125,12 +125,13 @@ class OfficeConverter
      */
     protected function prepOutput($outdir, $filename, $outputExtension)
     {
+        $DS = DIRECTORY_SEPARATOR;
         $tmpName = str_replace($this->extension, '', $this->basename).$outputExtension;
-        if (rename($outdir.'\\'.$tmpName, $outdir.'\\'.$filename)) {
-            return $outdir.'\\'.$filename;
+        if (rename($outdir.$DS.$tmpName, $outdir.$DS.$filename)) {
+            return $outdir.$DS.$filename;
         }
-        elseif (is_file($outdir.'\\'.$tmpName)) {
-            return $outdir.'\\'.$tmpName;
+        elseif (is_file($outdir.$DS.$tmpName)) {
+            return $outdir.$DS.$tmpName;
         }
 
         return null;
