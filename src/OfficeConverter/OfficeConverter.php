@@ -45,7 +45,10 @@ class OfficeConverter
         }
 
         $outdir = $this->tempPath;
-        shell_exec($this->makeCommand($outdir, $outputExtension));
+        $shell = $this->exec($this->makeCommand($outdir, $outputExtension));
+        if ($shell['return'] != 0) {
+            throw new OfficeConverterException("Convertion Failure! Contact Server Admin.");
+        }
 
         return $this->prepOutput($outdir, $filename, $outputExtension);
     }
@@ -106,14 +109,8 @@ class OfficeConverter
     {
         $oriFile = escapeshellarg($this->file);
         $outputDirectory = escapeshellarg($outputDirectory);
-        if (PHP_OS === 'WINNT') {
-            $cmd = "{$this->bin} --headless -convert-to {$outputExtension} {$oriFile} -outdir {$outputDirectory}";
-        }
-        else {
-            $cmd = "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory}";
-        }
 
-        return $cmd;
+        return "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory}";
     }
 
     /**
@@ -163,5 +160,33 @@ class OfficeConverter
         }
 
         return $allowedConverter;
+    }
+
+    /**
+     * More intelligent interface to system calls
+     *
+     * @link http://php.net/manual/en/function.system.php
+     *
+     * @param $cmd
+     * @param string $input
+     *
+     * @return array
+     */
+    private function exec($cmd, $input = '')
+    {
+        $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+        fwrite($pipes[0], $input);
+        fclose($pipes[0]);
+        $stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        $rtn = proc_close($process);
+
+        return [
+            'stdout' => $stdout,
+            'stderr' => $stderr,
+            'return' => $rtn
+        ];
     }
 }
