@@ -37,7 +37,12 @@ class OfficeConverter
      */
     public function convertTo($filename)
     {
-        $outputExtension = pathinfo($filename, PATHINFO_EXTENSION);
+        if ($filename instanceof Illuminate\Http\UploadedFile) {
+            $outputExtension = $filename->getClientOriginalExtension();
+        } else {
+            $outputExtension = pathinfo($filename, PATHINFO_EXTENSION);
+        }        
+
         $supportedExtensions = $this->getAllowedConverter($this->extension);
 
         if (!in_array($outputExtension, $supportedExtensions)) {
