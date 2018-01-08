@@ -1,5 +1,5 @@
 # Office Converter
-####PHP Wrapper for LibreOffice
+#### PHP Wrapper for LibreOffice
 
 Convert offices files to PDF and HTML using LibreOffice or OpenOffice.
 Supported conversion formats include:
@@ -11,6 +11,9 @@ Supported conversion formats include:
 * doc => pdf, odt, html
 * xlsx => pdf
 * xls => pdf
+* png => pdf
+* jpg => pdf
+* jpeg => pdf
 
 ### Installation
 
@@ -19,15 +22,7 @@ It is recommended to install OfficeConverter through [Composer](http://getcompos
 Run this command within your project directory
 
 ```shell
-composer require ncjoes/office-converter
-```
-
-Or add this line to your `composer.json`
-
-```json
-{
-	"ncjoes/office-converter": "0.1.*"
-}
+composer require overseas-tw/office-converter
 ```
 
 ### Dependencies
@@ -40,7 +35,7 @@ Here are some samples.
 ```php
 <?php
 // if you are using composer, just use this
-use NcJoes\OfficeConverter\OfficeConverter;
+use overseas-tw\OfficeConverter\OfficeConverter;
 
 $converter = new OfficeConverter('test-file.docx');
 $converter->convertTo('output-file.pdf'); //generates pdf file in same directory as test-file.docx
