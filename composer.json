@@ -17,7 +17,7 @@
     },
     "autoload" : {
         "psr-4" : {
-            "overseas-tw\\OfficeConverter\\" : "src/OfficeConverter"
+            "overseasTW\\OfficeConverter\\" : "src/OfficeConverter"
         }
     },
     "minimum-stability" : "stable"
