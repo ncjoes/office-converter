@@ -1,11 +1,11 @@
 <?php
 
-namespace overseasTW\OfficeConverter;
+namespace NcJoes\OfficeConverter;
 
 /**
  * Class OfficeConverter
  *
- * @package overseasTW\OfficeConverter
+ * @package NcJoes\OfficeConverter
  */
 class OfficeConverter
 {
