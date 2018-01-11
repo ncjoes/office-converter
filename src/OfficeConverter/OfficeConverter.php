@@ -150,8 +150,11 @@ class OfficeConverter
             'xlsx' => ['pdf'],
             'xls' => ['pdf'],
             'png' => ['pdf'],
+            'PNG' => ['pdf'],
             'jpg' => ['pdf'],
+            'JPG' => ['pdf'],
             'jpeg' => ['pdf'],
+            'JPEG' => ['pdf'],
         ];
 
         if ($extension !== null) {
