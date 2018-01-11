@@ -141,6 +141,8 @@ class OfficeConverter
      */
     private function getAllowedConverter($extension = null)
     {
+        $extension = strtolower($extension);
+        
         $allowedConverter = [
             'pptx' => ['pdf'],
             'ppt' => ['pdf'],
