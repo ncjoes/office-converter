@@ -83,7 +83,6 @@ class OfficeConverter
         //extension
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
 
-        $extension = strtolower($extension);
         //Check for valid input file extension
         if (!array_key_exists($extension, $this->getAllowedConverter())) {
             throw new OfficeConverterException('Input file extension not supported -- '.$extension);
@@ -156,6 +155,19 @@ class OfficeConverter
             'png' => ['pdf'],
             'jpg' => ['pdf'],
             'jpeg' => ['pdf'],
+            'PPTX' => ['pdf'],
+            'PPT' => ['pdf'],
+            'PDF' => ['pdf'],
+            'DOCX' => ['pdf', 'odt', 'html'],
+            'DOC' => ['pdf', 'odt', 'html'],
+            'DOTX' => ['pdf', 'odt', 'html'],
+            'DOT' => ['pdf', 'odt', 'html'],
+            'ODT' => ['pdf', 'html'],
+            'XLSX' => ['pdf'],
+            'XLS' => ['pdf'],
+            'PNG' => ['pdf'],
+            'JPG' => ['pdf'],
+            'JPEG' => ['pdf'],
         ];
 
         if ($extension !== null) {
