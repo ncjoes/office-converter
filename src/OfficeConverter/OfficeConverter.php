@@ -149,14 +149,14 @@ class OfficeConverter
             'pdf' => ['pdf'],
             'docx' => ['pdf', 'odt', 'html'],
             'doc' => ['pdf', 'odt', 'html'],
+            'dotx' => ['pdf', 'odt', 'html'],
+            'dot' => ['pdf', 'odt', 'html'],
+            'odt' => ['pdf', 'html'],
             'xlsx' => ['pdf'],
             'xls' => ['pdf'],
             'png' => ['pdf'],
-            'PNG' => ['pdf'],
             'jpg' => ['pdf'],
-            'JPG' => ['pdf'],
             'jpeg' => ['pdf'],
-            'JPEG' => ['pdf'],
         ];
 
         if ($extension !== null) {
