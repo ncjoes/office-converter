@@ -83,6 +83,7 @@ class OfficeConverter
         //extension
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
 
+        $extension = strtolower($extension);
         //Check for valid input file extension
         if (!array_key_exists($extension, $this->getAllowedConverter())) {
             throw new OfficeConverterException('Input file extension not supported -- '.$extension);
@@ -141,8 +142,6 @@ class OfficeConverter
      */
     private function getAllowedConverter($extension = null)
     {
-        $extension = strtolower($extension);
-        
         $allowedConverter = [
             'pptx' => ['pdf'],
             'ppt' => ['pdf'],
