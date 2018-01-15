@@ -153,6 +153,7 @@ class OfficeConverter
             'pdf' => ['pdf'],
             'docx' => ['pdf', 'odt', 'html'],
             'doc' => ['pdf', 'odt', 'html'],
+            'wps' => ['pdf', 'odt', 'html'],
             'dotx' => ['pdf', 'odt', 'html'],
             'docm' => ['pdf', 'odt', 'html'],
             'dotm' => ['pdf', 'odt', 'html'],
@@ -169,6 +170,7 @@ class OfficeConverter
             'PDF' => ['pdf'],
             'DOCX' => ['pdf', 'odt', 'html'],
             'DOC' => ['pdf', 'odt', 'html'],
+            'WPS' => ['pdf', 'odt', 'html'],
             'DOTX' => ['pdf', 'odt', 'html'],
             'DOCM' => ['pdf', 'odt', 'html'],
             'DOTM' => ['pdf', 'odt', 'html'],
@@ -179,11 +181,13 @@ class OfficeConverter
             'PNG' => ['pdf'],
             'JPG' => ['pdf'],
             'JPEG' => ['pdf'],
+            'JFIF' => ['pdf'],
             'Pptx' => ['pdf'],
             'Ppt' => ['pdf'],
             'Pdf' => ['pdf'],
             'Docx' => ['pdf', 'odt', 'html'],
             'Doc' => ['pdf', 'odt', 'html'],
+            'Wps' => ['pdf', 'odt', 'html'],
             'Dotx' => ['pdf', 'odt', 'html'],
             'Docm' => ['pdf', 'odt', 'html'],
             'Dotm' => ['pdf', 'odt', 'html'],
@@ -194,6 +198,7 @@ class OfficeConverter
             'Png' => ['pdf'],
             'Jpg' => ['pdf'],
             'Jpeg' => ['pdf'],
+            'Jfif' => ['pdf'],
         ];
 
         if ($extension !== null) {
