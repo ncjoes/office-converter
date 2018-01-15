@@ -83,6 +83,11 @@ class OfficeConverter
         //extension
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
 
+        // var_dump($extension);
+        // $extension = strtolower($extension);
+        var_dump($this->basename);
+        var_dump($extension);
+
         //Check for valid input file extension
         if (!array_key_exists($extension, $this->getAllowedConverter())) {
             throw new OfficeConverterException('Input file extension not supported -- '.$extension);
@@ -142,12 +147,15 @@ class OfficeConverter
     private function getAllowedConverter($extension = null)
     {
         $allowedConverter = [
+            '' => ['pdf'],
             'pptx' => ['pdf'],
             'ppt' => ['pdf'],
             'pdf' => ['pdf'],
             'docx' => ['pdf', 'odt', 'html'],
             'doc' => ['pdf', 'odt', 'html'],
             'dotx' => ['pdf', 'odt', 'html'],
+            'docm' => ['pdf', 'odt', 'html'],
+            'dotm' => ['pdf', 'odt', 'html'],
             'dot' => ['pdf', 'odt', 'html'],
             'odt' => ['pdf', 'html'],
             'xlsx' => ['pdf'],
@@ -155,12 +163,15 @@ class OfficeConverter
             'png' => ['pdf'],
             'jpg' => ['pdf'],
             'jpeg' => ['pdf'],
+            'jfif' => ['pdf'],
             'PPTX' => ['pdf'],
             'PPT' => ['pdf'],
             'PDF' => ['pdf'],
             'DOCX' => ['pdf', 'odt', 'html'],
             'DOC' => ['pdf', 'odt', 'html'],
             'DOTX' => ['pdf', 'odt', 'html'],
+            'DOCM' => ['pdf', 'odt', 'html'],
+            'DOTM' => ['pdf', 'odt', 'html'],
             'DOT' => ['pdf', 'odt', 'html'],
             'ODT' => ['pdf', 'html'],
             'XLSX' => ['pdf'],
@@ -168,6 +179,21 @@ class OfficeConverter
             'PNG' => ['pdf'],
             'JPG' => ['pdf'],
             'JPEG' => ['pdf'],
+            'Pptx' => ['pdf'],
+            'Ppt' => ['pdf'],
+            'Pdf' => ['pdf'],
+            'Docx' => ['pdf', 'odt', 'html'],
+            'Doc' => ['pdf', 'odt', 'html'],
+            'Dotx' => ['pdf', 'odt', 'html'],
+            'Docm' => ['pdf', 'odt', 'html'],
+            'Dotm' => ['pdf', 'odt', 'html'],
+            'Dot' => ['pdf', 'odt', 'html'],
+            'Ddt' => ['pdf', 'html'],
+            'Xlsx' => ['pdf'],
+            'Xls' => ['pdf'],
+            'Png' => ['pdf'],
+            'Jpg' => ['pdf'],
+            'Jpeg' => ['pdf'],
         ];
 
         if ($extension !== null) {
