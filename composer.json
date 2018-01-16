@@ -20,5 +20,5 @@
             "overseasTW\\OfficeConverter\\" : "src/OfficeConverter"
         }
     },
-    "minimum-stability" : "stable"
+    "minimum-stability" : "dev"
 }
