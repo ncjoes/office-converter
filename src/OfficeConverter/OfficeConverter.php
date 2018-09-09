@@ -224,6 +224,7 @@ class OfficeConverter
      */
     private function exec($cmd, $input = '')
     {
+        $cmd = "export HOME=/tmp && " . $cmd;
         $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         fwrite($pipes[0], $input);
         fclose($pipes[0]);
