@@ -175,6 +175,12 @@ class OfficeConverter
      */
     private function exec($cmd, $input = '')
     {
+        // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
+        // getenv('HOME') isn't set on Windows and generates a Notice.
+        $home = getenv('HOME');
+        if (!is_writable($home)) {
+            $cmd = 'export HOME=/tmp && ' . $cmd;
+        }
         $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         fwrite($pipes[0], $input);
         fclose($pipes[0]);
