@@ -81,7 +81,11 @@ class OfficeConverter
         $this->basename = pathinfo($this->file, PATHINFO_BASENAME);
 
         //extension
-        $extension = pathinfo($this->file, PATHINFO_EXTENSION);
+        if ($this->file instanceof Illuminate\Http\UploadedFile) {
+            $extension = $this->file->getClientOriginalExtension();
+        } else {
+            $extension = pathinfo($this->file, PATHINFO_EXTENSION);
+        }    
 
         //Check for valid input file extension
         if (!array_key_exists($extension, $this->getAllowedConverter())) {
@@ -149,7 +153,7 @@ class OfficeConverter
             'doc' => ['pdf', 'odt', 'html'],
             'xlsx' => ['pdf'],
             'xls' => ['pdf'],
-            'rtf' => ['docx']
+            'rtf' => ['docx', 'txt]
         ];
 
         if ($extension !== null) {
