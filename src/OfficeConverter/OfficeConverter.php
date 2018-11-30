@@ -153,7 +153,7 @@ class OfficeConverter
             'doc' => ['pdf', 'odt', 'html'],
             'xlsx' => ['pdf'],
             'xls' => ['pdf'],
-            'rtf' => ['docx', 'txt]
+            'rtf' => ['docx', 'txt']
         ];
 
         if ($extension !== null) {
