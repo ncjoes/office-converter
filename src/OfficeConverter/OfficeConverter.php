@@ -14,6 +14,7 @@ class OfficeConverter
     private $tempPath;
     private $extension;
     private $basename;
+    private $prefixExecWithExportHome;
 
     /**
      * OfficeConverter constructor.
@@ -21,11 +22,12 @@ class OfficeConverter
      * @param $filename
      * @param null $tempPath
      * @param string $bin
+     * @param bool $prefixExecWithExportHome
      */
-    public function __construct($filename, $tempPath = null, $bin = 'libreoffice')
+    public function __construct($filename, $tempPath = null, $bin = 'libreoffice', $prefixExecWithExportHome = true)
     {
         if ($this->open($filename)) {
-            $this->setup($tempPath, $bin);
+            $this->setup($tempPath, $bin, $prefixExecWithExportHome);
         }
     }
 
@@ -72,10 +74,11 @@ class OfficeConverter
     /**
      * @param $tempPath
      * @param $bin
+     * @param $prefixExecWithExportHome
      *
      * @throws OfficeConverterException
      */
-    protected function setup($tempPath, $bin)
+    protected function setup($tempPath, $bin, $prefixExecWithExportHome)
     {
         //basename
         $this->basename = pathinfo($this->file, PATHINFO_BASENAME);
@@ -85,7 +88,7 @@ class OfficeConverter
             $extension = $this->file->getClientOriginalExtension();
         } else {
             $extension = pathinfo($this->file, PATHINFO_EXTENSION);
-        }    
+        }
 
         //Check for valid input file extension
         if (!array_key_exists($extension, $this->getAllowedConverter())) {
@@ -101,6 +104,9 @@ class OfficeConverter
 
         //binary location
         $this->bin = $bin;
+
+        //use prefix export home or not
+        $this->prefixExecWithExportHome = $prefixExecWithExportHome;
     }
 
     /**
@@ -181,9 +187,11 @@ class OfficeConverter
     {
         // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
         // getenv('HOME') isn't set on Windows and generates a Notice.
-        $home = getenv('HOME');
-        if (!is_writable($home)) {
-            $cmd = 'export HOME=/tmp && ' . $cmd;
+        if ($this->prefixExecWithExportHome) {
+          $home = getenv('HOME');
+          if (!is_writable($home)) {
+              $cmd = 'export HOME=/tmp && ' . $cmd;
+          }
         }
         $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
         fwrite($pipes[0], $input);
