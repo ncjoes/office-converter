@@ -8,8 +8,9 @@
  **/
 
 use NcJoes\OfficeConverter\OfficeConverter;
+use PHPUnit\Framework\TestCase;
 
-class OfficeConverterTest extends PHPUnit_Framework_TestCase
+class OfficeConverterTest extends TestCase
 {
     /**
      * @var OfficeConverter $converter
@@ -21,8 +22,9 @@ class OfficeConverterTest extends PHPUnit_Framework_TestCase
     {
         parent::setUp();
 
-        $file = __DIR__.'\sources\test1.docx';
-        $this->outDir = __DIR__.'\results';
+        $DS = DIRECTORY_SEPARATOR;
+        $file = __DIR__."{$DS}sources{$DS}test1.docx";
+        $this->outDir = __DIR__."{$DS}results";
 
         $this->converter = new OfficeConverter($file, $this->outDir);
     }

@@ -1,5 +1,5 @@
 # Office Converter
-####PHP Wrapper for LibreOffice
+#### PHP Wrapper for LibreOffice
 
 Convert offices files to PDF and HTML using LibreOffice or OpenOffice.
 Supported conversion formats include:
@@ -11,6 +11,9 @@ Supported conversion formats include:
 * doc => pdf, odt, html
 * xlsx => pdf
 * xls => pdf
+* png => pdf
+* jpg => pdf
+* jpeg => pdf
 
 ### Installation
 
@@ -20,14 +23,6 @@ Run this command within your project directory
 
 ```shell
 composer require ncjoes/office-converter
-```
-
-Or add this line to your `composer.json`
-
-```json
-{
-	"ncjoes/office-converter": "0.1.*"
-}
 ```
 
 ### Dependencies
