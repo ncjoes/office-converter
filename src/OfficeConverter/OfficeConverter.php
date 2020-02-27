@@ -9,18 +9,24 @@ namespace NcJoes\OfficeConverter;
  */
 class OfficeConverter
 {
+    /** @var string */
     private $file;
+    /** @var string */
     private $bin;
+    /** @var string */
     private $tempPath;
+    /** @var string */
     private $extension;
+    /** @var string */
     private $basename;
+    /** @var bool */
     private $prefixExecWithExportHome;
 
     /**
      * OfficeConverter constructor.
      *
-     * @param $filename
-     * @param null $tempPath
+     * @param string $filename
+     * @param null|string $tempPath
      * @param string $bin
      * @param bool $prefixExecWithExportHome
      */
@@ -32,7 +38,7 @@ class OfficeConverter
     }
 
     /**
-     * @param $filename
+     * @param string $filename
      *
      * @return null|string
      * @throws OfficeConverterException
@@ -56,25 +62,28 @@ class OfficeConverter
     }
 
     /**
-     * @param $filename
+     * @param string $filename
      *
      * @return bool
      * @throws OfficeConverterException
      */
     protected function open($filename)
     {
-        if (!file_exists($filename)) {
+        if (!file_exists($filename) || false === realpath($filename)) {
             throw new OfficeConverterException('File does not exist --'.$filename);
         }
+
         $this->file = realpath($filename);
 
         return true;
     }
 
     /**
-     * @param $tempPath
-     * @param $bin
-     * @param $prefixExecWithExportHome
+     * @param null|string $tempPath
+     * @param string $bin
+     * @param bool $prefixExecWithExportHome
+     *
+     * @return void
      *
      * @throws OfficeConverterException
      */
@@ -93,10 +102,15 @@ class OfficeConverter
         $this->extension = $extension;
 
         //setup output path
-        if (!is_dir($tempPath)) {
+        if (null === $tempPath || !is_dir($tempPath)) {
             $tempPath = dirname($this->file);
         }
-        $this->tempPath = realpath($tempPath);
+
+        if (false === realpath($tempPath)) {
+            $this->tempPath = sys_get_temp_dir();
+        } else {
+            $this->tempPath = realpath($tempPath);
+        }
 
         //binary location
         $this->bin = $bin;
@@ -106,8 +120,8 @@ class OfficeConverter
     }
 
     /**
-     * @param $outputDirectory
-     * @param $outputExtension
+     * @param string $outputDirectory
+     * @param string $outputExtension
      *
      * @return string
      */
@@ -120,9 +134,9 @@ class OfficeConverter
     }
 
     /**
-     * @param $outdir
-     * @param $filename
-     * @param $outputExtension
+     * @param string $outdir
+     * @param string $filename
+     * @param string $outputExtension
      *
      * @return null|string
      */
@@ -140,7 +154,7 @@ class OfficeConverter
     }
 
     /**
-     * @param null $extension
+     * @param string|null $extension
      *
      * @return array|mixed
      */
@@ -202,7 +216,7 @@ class OfficeConverter
             'rtf'  => ['docx', 'txt']
         ];
 
-        if ($extension !== null) {
+        if (null !== $extension) {
             if (isset($allowedConverter[$extension])) {
                 return $allowedConverter[$extension];
             }
@@ -218,7 +232,7 @@ class OfficeConverter
      *
      * @link http://php.net/manual/en/function.system.php
      *
-     * @param $cmd
+     * @param string $cmd
      * @param string $input
      *
      * @return array
@@ -229,11 +243,16 @@ class OfficeConverter
         // getenv('HOME') isn't set on Windows and generates a Notice.
         if ($this->prefixExecWithExportHome) {
           $home = getenv('HOME');
-          if (!is_writable($home)) {
+          if (false === $home || !is_writable($home)) {
               $cmd = 'export HOME=/tmp && ' . $cmd;
           }
         }
         $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+
+        if (false === $process) {
+          throw new OfficeConverterException('Cannot obtain ressource for process to convert file');
+        }
+
         fwrite($pipes[0], $input);
         fclose($pipes[0]);
         $stdout = stream_get_contents($pipes[1]);
