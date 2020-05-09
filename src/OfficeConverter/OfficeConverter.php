@@ -2,27 +2,28 @@
 
 namespace NcJoes\OfficeConverter;
 
-/**
- * Class OfficeConverter
- *
- * @package NcJoes\OfficeConverter
- */
 class OfficeConverter
 {
+    /** @var string */
     private $file;
+    /** @var string */
     private $bin;
+    /** @var string */
     private $tempPath;
+    /** @var string */
     private $extension;
+    /** @var string */
     private $basename;
+    /** @var bool */
     private $prefixExecWithExportHome;
 
     /**
      * OfficeConverter constructor.
      *
-     * @param $filename
-     * @param null $tempPath
-     * @param string $bin
-     * @param bool $prefixExecWithExportHome
+     * @param string      $filename
+     * @param string|null $tempPath
+     * @param string      $bin
+     * @param bool        $prefixExecWithExportHome
      */
     public function __construct($filename, $tempPath = null, $bin = 'libreoffice', $prefixExecWithExportHome = true)
     {
@@ -32,9 +33,10 @@ class OfficeConverter
     }
 
     /**
-     * @param $filename
+     * @param string $filename
      *
-     * @return null|string
+     * @return string|null
+     *
      * @throws OfficeConverterException
      */
     public function convertTo($filename)
@@ -48,33 +50,37 @@ class OfficeConverter
 
         $outdir = $this->tempPath;
         $shell = $this->exec($this->makeCommand($outdir, $outputExtension));
-        if ($shell['return'] != 0) {
-            throw new OfficeConverterException("Convertion Failure! Contact Server Admin.");
+        if (0 != $shell['return']) {
+            throw new OfficeConverterException('Convertion Failure! Contact Server Admin.');
         }
 
         return $this->prepOutput($outdir, $filename, $outputExtension);
     }
 
     /**
-     * @param $filename
+     * @param string $filename
      *
      * @return bool
+     *
      * @throws OfficeConverterException
      */
     protected function open($filename)
     {
-        if (!file_exists($filename)) {
+        if (!file_exists($filename) || false === realpath($filename)) {
             throw new OfficeConverterException('File does not exist --'.$filename);
         }
+
         $this->file = realpath($filename);
 
         return true;
     }
 
     /**
-     * @param $tempPath
-     * @param $bin
-     * @param $prefixExecWithExportHome
+     * @param string|null $tempPath
+     * @param string      $bin
+     * @param bool        $prefixExecWithExportHome
+     *
+     * @return void
      *
      * @throws OfficeConverterException
      */
@@ -93,10 +99,15 @@ class OfficeConverter
         $this->extension = $extension;
 
         //setup output path
-        if (!is_dir($tempPath)) {
+        if (null === $tempPath || !is_dir($tempPath)) {
             $tempPath = dirname($this->file);
         }
-        $this->tempPath = realpath($tempPath);
+
+        if (false === realpath($tempPath)) {
+            $this->tempPath = sys_get_temp_dir();
+        } else {
+            $this->tempPath = realpath($tempPath);
+        }
 
         //binary location
         $this->bin = $bin;
@@ -106,8 +117,8 @@ class OfficeConverter
     }
 
     /**
-     * @param $outputDirectory
-     * @param $outputExtension
+     * @param string $outputDirectory
+     * @param string $outputExtension
      *
      * @return string
      */
@@ -120,11 +131,11 @@ class OfficeConverter
     }
 
     /**
-     * @param $outdir
-     * @param $filename
-     * @param $outputExtension
+     * @param string $outdir
+     * @param string $filename
+     * @param string $outputExtension
      *
-     * @return null|string
+     * @return string|null
      */
     protected function prepOutput($outdir, $filename, $outputExtension)
     {
@@ -140,69 +151,69 @@ class OfficeConverter
     }
 
     /**
-     * @param null $extension
+     * @param string|null $extension
      *
      * @return array|mixed
      */
     private function getAllowedConverter($extension = null)
     {
         $allowedConverter = [
-            ''     => ['pdf'],
+            '' => ['pdf'],
             'pptx' => ['pdf'],
-            'ppt'  => ['pdf'],
-            'pdf'  => ['pdf'],
+            'ppt' => ['pdf'],
+            'pdf' => ['pdf'],
             'docx' => ['pdf', 'odt', 'html'],
-            'doc'  => ['pdf', 'odt', 'html'],
-            'wps'  => ['pdf', 'odt', 'html'],
+            'doc' => ['pdf', 'odt', 'html'],
+            'wps' => ['pdf', 'odt', 'html'],
             'dotx' => ['pdf', 'odt', 'html'],
             'docm' => ['pdf', 'odt', 'html'],
             'dotm' => ['pdf', 'odt', 'html'],
-            'dot'  => ['pdf', 'odt', 'html'],
-            'odt'  => ['pdf', 'html'],
+            'dot' => ['pdf', 'odt', 'html'],
+            'odt' => ['pdf', 'html'],
             'xlsx' => ['pdf'],
-            'xls'  => ['pdf'],
-            'png'  => ['pdf'],
-            'jpg'  => ['pdf'],
+            'xls' => ['pdf'],
+            'png' => ['pdf'],
+            'jpg' => ['pdf'],
             'jpeg' => ['pdf'],
             'jfif' => ['pdf'],
             'PPTX' => ['pdf'],
-            'PPT'  => ['pdf'],
-            'PDF'  => ['pdf'],
+            'PPT' => ['pdf'],
+            'PDF' => ['pdf'],
             'DOCX' => ['pdf', 'odt', 'html'],
-            'DOC'  => ['pdf', 'odt', 'html'],
-            'WPS'  => ['pdf', 'odt', 'html'],
+            'DOC' => ['pdf', 'odt', 'html'],
+            'WPS' => ['pdf', 'odt', 'html'],
             'DOTX' => ['pdf', 'odt', 'html'],
             'DOCM' => ['pdf', 'odt', 'html'],
             'DOTM' => ['pdf', 'odt', 'html'],
-            'DOT'  => ['pdf', 'odt', 'html'],
-            'ODT'  => ['pdf', 'html'],
+            'DOT' => ['pdf', 'odt', 'html'],
+            'ODT' => ['pdf', 'html'],
             'XLSX' => ['pdf'],
-            'XLS'  => ['pdf'],
-            'PNG'  => ['pdf'],
-            'JPG'  => ['pdf'],
+            'XLS' => ['pdf'],
+            'PNG' => ['pdf'],
+            'JPG' => ['pdf'],
             'JPEG' => ['pdf'],
             'JFIF' => ['pdf'],
             'Pptx' => ['pdf'],
-            'Ppt'  => ['pdf'],
-            'Pdf'  => ['pdf'],
+            'Ppt' => ['pdf'],
+            'Pdf' => ['pdf'],
             'Docx' => ['pdf', 'odt', 'html'],
-            'Doc'  => ['pdf', 'odt', 'html'],
-            'Wps'  => ['pdf', 'odt', 'html'],
+            'Doc' => ['pdf', 'odt', 'html'],
+            'Wps' => ['pdf', 'odt', 'html'],
             'Dotx' => ['pdf', 'odt', 'html'],
             'Docm' => ['pdf', 'odt', 'html'],
             'Dotm' => ['pdf', 'odt', 'html'],
-            'Dot'  => ['pdf', 'odt', 'html'],
-            'Ddt'  => ['pdf', 'html'],
+            'Dot' => ['pdf', 'odt', 'html'],
+            'Ddt' => ['pdf', 'html'],
             'Xlsx' => ['pdf'],
-            'Xls'  => ['pdf'],
-            'Png'  => ['pdf'],
-            'Jpg'  => ['pdf'],
+            'Xls' => ['pdf'],
+            'Png' => ['pdf'],
+            'Jpg' => ['pdf'],
             'Jpeg' => ['pdf'],
             'Jfif' => ['pdf'],
-            'rtf'  => ['docx', 'txt']
+            'rtf' => ['docx', 'txt'],
         ];
 
-        if ($extension !== null) {
+        if (null !== $extension) {
             if (isset($allowedConverter[$extension])) {
                 return $allowedConverter[$extension];
             }
@@ -214,11 +225,11 @@ class OfficeConverter
     }
 
     /**
-     * More intelligent interface to system calls
+     * More intelligent interface to system calls.
      *
-     * @link http://php.net/manual/en/function.system.php
+     * @see http://php.net/manual/en/function.system.php
      *
-     * @param $cmd
+     * @param string $cmd
      * @param string $input
      *
      * @return array
@@ -228,12 +239,17 @@ class OfficeConverter
         // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
         // getenv('HOME') isn't set on Windows and generates a Notice.
         if ($this->prefixExecWithExportHome) {
-          $home = getenv('HOME');
-          if (!is_writable($home)) {
-              $cmd = 'export HOME=/tmp && ' . $cmd;
-          }
+            $home = getenv('HOME');
+            if (false === $home || !is_writable($home)) {
+                $cmd = 'export HOME=/tmp && '.$cmd;
+            }
         }
         $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
+
+        if (false === $process) {
+            throw new OfficeConverterException('Cannot obtain ressource for process to convert file');
+        }
+
         fwrite($pipes[0], $input);
         fclose($pipes[0]);
         $stdout = stream_get_contents($pipes[1]);
@@ -245,7 +261,7 @@ class OfficeConverter
         return [
             'stdout' => $stdout,
             'stderr' => $stderr,
-            'return' => $rtn
+            'return' => $rtn,
         ];
     }
 }
