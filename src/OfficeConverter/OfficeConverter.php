@@ -210,7 +210,7 @@ class OfficeConverter
             'Jpg' => ['pdf'],
             'Jpeg' => ['pdf'],
             'Jfif' => ['pdf'],
-            'rtf'  => ['docx', 'txt'],
+            'rtf'  => ['docx', 'txt', 'pdf'],
             'txt'  => ['pdf', 'odt', 'doc', 'docx', 'html'],
         ];
 
@@ -241,7 +241,7 @@ class OfficeConverter
         // getenv('HOME') isn't set on Windows and generates a Notice.
         if ($this->prefixExecWithExportHome) {
             $home = getenv('HOME');
-            if (false === $home || !is_writable($home)) {
+            if (!is_writable($home)) {
                 $cmd = 'export HOME=/tmp && '.$cmd;
             }
         }
