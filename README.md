@@ -16,8 +16,6 @@ Supported conversion formats include:
 * jpeg => pdf
 
 ### Installation
-This is a fork, please use the [repo I forked](https://github.com/ncjoes/office-converter)
-
 It is recommended to install OfficeConverter through [Composer](http://getcomposer.org/).
 
 Run this command within your project directory
