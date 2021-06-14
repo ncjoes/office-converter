@@ -140,7 +140,7 @@ class OfficeConverter
     protected function prepOutput($outdir, $filename, $outputExtension)
     {
         $DS = DIRECTORY_SEPARATOR;
-        $tmpName = ($this->extension ? str_replace($this->extension, '', $this->basename) : $this->basename . '.').$outputExtension;
+        $tmpName = ($this->extension ? basename($this->basename, $this->extension) : $this->basename . '.').$outputExtension;
         if (rename($outdir.$DS.$tmpName, $outdir.$DS.$filename)) {
             return $outdir.$DS.$filename;
         } elseif (is_file($outdir.$DS.$tmpName)) {
