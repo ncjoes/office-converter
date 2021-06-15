@@ -25,8 +25,6 @@ Run this command within your project directory
 composer require ncjoes/office-converter
 ```
 
-Again, this will use the repo I forked, so it is NOT this repo!
-
 ### Dependencies
 In order to use OfficeConverter, you need to install [LibreOffice](http://www.libreoffice.org/).
 
