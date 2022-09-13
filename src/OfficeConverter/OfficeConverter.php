@@ -16,6 +16,8 @@ class OfficeConverter
     private $basename;
     /** @var bool */
     private $prefixExecWithExportHome;
+    /** @var string */
+    private $logPath;
 
     /**
      * OfficeConverter constructor.
@@ -25,10 +27,10 @@ class OfficeConverter
      * @param string      $bin
      * @param bool        $prefixExecWithExportHome
      */
-    public function __construct($filename, $tempPath = null, $bin = 'libreoffice', $prefixExecWithExportHome = true)
+    public function __construct($filename, $tempPath = null, $bin = 'libreoffice', $prefixExecWithExportHome = true, $logPath = null)
     {
         if ($this->open($filename)) {
-            $this->setup($tempPath, $bin, $prefixExecWithExportHome);
+            $this->setup($tempPath, $bin, $prefixExecWithExportHome, $logPath);
         }
     }
 
@@ -84,7 +86,7 @@ class OfficeConverter
      *
      * @throws OfficeConverterException
      */
-    protected function setup($tempPath, $bin, $prefixExecWithExportHome)
+    protected function setup($tempPath, $bin, $prefixExecWithExportHome, $logPath)
     {
         //basename
         $this->basename = pathinfo($this->file, PATHINFO_BASENAME);
@@ -114,6 +116,9 @@ class OfficeConverter
 
         //use prefix export home or not
         $this->prefixExecWithExportHome = $prefixExecWithExportHome;
+
+        // log path
+        $this->logPath = realpath($logPath);
     }
 
     /**
@@ -126,8 +131,9 @@ class OfficeConverter
     {
         $oriFile = escapeshellarg($this->file);
         $outputDirectory = escapeshellarg($outputDirectory);
+        $logCmd = $this->logPath ? ">> {$this->logPath}" : "";
 
-        return "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory}";
+        return "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory} {$logCmd}";
     }
 
     /**
