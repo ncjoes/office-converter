@@ -30,7 +30,7 @@ In order to use OfficeConverter, you need to install [LibreOffice](http://www.li
 
 ### Usage
 
-Here are some samples.
+Here are some samples with timeout.
 
 ```php
 <?php
@@ -40,6 +40,9 @@ use NcJoes\OfficeConverter\OfficeConverter;
 $converter = new OfficeConverter('test-file.docx');
 $converter->convertTo('output-file.pdf'); //generates pdf file in same directory as test-file.docx
 $converter->convertTo('output-file.html'); //generates html file in same directory as test-file.docx
+
+// With timeout
+$converter->convertTo('output-file.pdf', 60); //generates pdf file in same directory as test-file.docx
 
 //to specify output directory, specify it as the second argument to the constructor
 $converter = new OfficeConverter('test-file.docx', 'path-to-outdir');
