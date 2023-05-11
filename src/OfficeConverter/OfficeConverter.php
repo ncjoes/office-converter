@@ -39,7 +39,7 @@ class OfficeConverter
      *
      * @throws OfficeConverterException
      */
-    public function convertTo($filename)
+    public function convertTo($filename, $timeout = 20)
     {
         $outputExtension = pathinfo($filename, PATHINFO_EXTENSION);
         $supportedExtensions = $this->getAllowedConverter($this->extension);
@@ -49,9 +49,25 @@ class OfficeConverter
         }
 
         $outdir = $this->tempPath;
-        $shell = $this->exec($this->makeCommand($outdir, $outputExtension));
+        $shell = $this->exec($this->makeCommand($outdir, $outputExtension, $timeout));
+        // $shell['return'] = 124; //!for testing (mimic timeout)
         if (0 != $shell['return']) {
-            throw new OfficeConverterException('Convertion Failure! Contact Server Admin.');
+            echo '<pre>shell : ', print_r($shell, true) ,'</pre>';
+            echo '<pre>info : ', print_r([
+                $filename,
+                $outdir,
+                $outputExtension,
+                $timeout
+            ], true) ,'</pre>';
+
+            if (124 === $shell['return']) {
+
+                if (file_exists($outdir. '/.~lock.'.$filename.'#')) unlink($outdir. '/.~lock.'.$filename.'#');
+
+                throw new OfficeConverterException('Conversion Timed Out! File: '.$outdir.$filename);
+
+            }
+            throw new OfficeConverterException('Conversion Failure! Contact Server Admin.');
         }
 
         return $this->prepOutput($outdir, $filename, $outputExtension);
@@ -122,12 +138,13 @@ class OfficeConverter
      *
      * @return string
      */
-    protected function makeCommand($outputDirectory, $outputExtension)
+    protected function makeCommand($outputDirectory, $outputExtension, $timeout)
     {
+        $timeOutCmd = $timeout !== 0 ? 'timeout '.$timeout.'s -k' : '';
         $oriFile = escapeshellarg($this->file);
         $outputDirectory = escapeshellarg($outputDirectory);
 
-        return "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory}";
+        return "{$timeOutCmd} {$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory}";
     }
 
     /**
