@@ -52,24 +52,20 @@ class OfficeConverter
         $shell = $this->exec($this->makeCommand($outdir, $outputExtension, $timeout));
         // $shell['return'] = 124; //!for testing (mimic timeout)
         if (0 != $shell['return']) {
-            echo '<pre>shell : ', print_r($shell, true) ,'</pre>';
-            echo '<pre>info : ', print_r([
-                $filename,
-                $outdir,
-                $outputExtension,
-                $timeout
-            ], true) ,'</pre>';
+            // log error to error logs
+            error_log("PDF Conversion Error: " . print_r($shell, true), 0);
+            // echo '<pre>shell : ', print_r($shell, true) ,'</pre>';
+            // echo '<pre>info : ', print_r([ $filename, $outdir, $outputExtension, $timeout ], true) ,'</pre>';
 
             if (124 === $shell['return']) {
-
-                if (file_exists($outdir. '/.~lock.'.$filename.'#')) unlink($outdir. '/.~lock.'.$filename.'#');
-
-                throw new OfficeConverterException('Conversion Timed Out! File: '.$outdir.$filename);
-
+                if (file_exists($outdir. '/.~lock.'.$filename.'#')) {
+                    unlink($outdir. '/.~lock.'.$filename.'#');  
+                }
             }
-            throw new OfficeConverterException('Conversion Failure! Contact Server Admin.');
+            throw new OfficeConverterException('Conversion Timed Out! File: '.$outdir.'/'.$filename);
+            
         }
-
+        
         return $this->prepOutput($outdir, $filename, $outputExtension);
     }
 
@@ -140,7 +136,7 @@ class OfficeConverter
      */
     protected function makeCommand($outputDirectory, $outputExtension, $timeout)
     {
-        $timeOutCmd = $timeout !== 0 ? 'timeout '.$timeout.'s -k' : '';
+        $timeOutCmd = $timeout !== 0 ? 'timeout '.$timeout.'s' : '';
         $oriFile = escapeshellarg($this->file);
         $outputDirectory = escapeshellarg($outputDirectory);
 
