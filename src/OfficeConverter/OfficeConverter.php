@@ -212,6 +212,7 @@ class OfficeConverter
             'Jfif' => ['pdf'],
             'rtf'  => ['docx', 'txt', 'pdf'],
             'txt'  => ['pdf', 'odt', 'doc', 'docx', 'html'],
+            'csv'  => ['pdf'],
         ];
 
         if (null !== $extension) {
