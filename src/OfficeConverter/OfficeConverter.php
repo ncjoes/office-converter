@@ -17,6 +17,7 @@ class OfficeConverter
     /** @var bool */
     private $prefixExecWithExportHome;
     /** @var string */
+    private $filter = '';
     private $logPath;
 
     /**
@@ -133,7 +134,18 @@ class OfficeConverter
         $outputDirectory = escapeshellarg($outputDirectory);
         $logCmd = $this->logPath ? ">> {$this->logPath}" : "";
 
-        return "{$this->bin} --headless --convert-to {$outputExtension} {$oriFile} --outdir {$outputDirectory} {$logCmd}";
+        return "{$this->bin} --headless --convert-to {$outputExtension}{$this->filter} {$oriFile} --outdir {$outputDirectory}";
+    }
+
+    /**
+     * @param string $filter
+     *
+     * @return OfficeConverter
+     */
+    public function setFilter ($filter)
+    {
+        $this->filter = ":" . $filter;
+        return $this;
     }
 
     /**
@@ -165,6 +177,7 @@ class OfficeConverter
     {
         $allowedConverter = [
             '' => ['pdf'],
+            'html' => ['pdf', 'docx'],
             'pptx' => ['pdf'],
             'ppt' => ['pdf'],
             'pdf' => ['pdf'],
