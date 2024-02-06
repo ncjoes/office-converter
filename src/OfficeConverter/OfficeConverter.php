@@ -53,13 +53,20 @@ class OfficeConverter
 
         $outdir = $this->tempPath;
         $shell = $this->exec($this->makeCommand($outdir, $outputExtension));
+
         if (0 != $shell['return']) {
-            throw new OfficeConverterException('Convertion Failure! Contact Server Admin.');
+            $croppedStderr = self::trimString($shell['stderr'], 1000);
+            throw new OfficeConverterException("Convertion Failure! Contact Server Admin: code {$shell['return']}, error : {$croppedStderr}");
         }
 
         return $this->prepOutput($outdir, $filename, $outputExtension);
     }
 
+    protected static function trimString($value, $limit = 200, $end = '...')
+    {
+        return (mb_strwidth($value, 'UTF-8') <= $limit) ? $value : rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
+    }
+    
     /**
      * @param string $filename
      *
@@ -134,7 +141,12 @@ class OfficeConverter
         $outputDirectory = escapeshellarg($outputDirectory);
         $logCmd = $this->logPath ? ">> {$this->logPath}" : "";
 
-        return "{$this->bin} --headless --convert-to {$outputExtension}{$this->filter} {$oriFile} --outdir {$outputDirectory}";
+        $randomNumber = mt_rand(1, 20);
+
+        // Add the userInstallationDirectory option
+        $userInstallationDirectoryOption = "-env:UserInstallation=file://{$_SERVER['HOME']}/.config/libreoffice-profile{$randomNumber}";
+
+        return "{$this->bin} --headless --convert-to {$outputExtension}{$this->filter} {$userInstallationDirectoryOption} {$oriFile} --outdir {$outputDirectory}";
     }
 
     /**
