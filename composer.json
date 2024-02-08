@@ -1,5 +1,5 @@
 {
-    "name" : "caiosousaupp/office-converter",
+    "name" : "ncjoes/office-converter",
     "description" : "PHP Wrapper for LibreOffice",
     "keywords" : ["Office","Converter"],
     "license" : "MIT",
