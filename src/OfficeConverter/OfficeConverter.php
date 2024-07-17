@@ -52,12 +52,7 @@ class OfficeConverter
         }
 
         $outdir = $this->tempPath;
-        $shell = $this->exec($this->makeCommand($outdir, $outputExtension));
-
-        if (0 != $shell['return']) {
-            $croppedStderr = self::trimString($shell['stderr'], 1000);
-            throw new OfficeConverterException("Convertion Failure! Contact Server Admin: code {$shell['return']}, error : {$croppedStderr}");
-        }
+        $this->exec($this->makeCommand($outdir, $outputExtension));
 
         return $this->prepOutput($outdir, $filename, $outputExtension);
     }
@@ -277,24 +272,13 @@ class OfficeConverter
                 $cmd = 'export HOME=/tmp && '.$cmd;
             }
         }
-        $process = proc_open($cmd, [0 => ['pipe', 'r'], 1 => ['pipe', 'w'], 2 => ['pipe', 'w']], $pipes);
 
-        if (false === $process) {
-            throw new OfficeConverterException('Cannot obtain ressource for process to convert file');
+        $exec = exec($cmd . ' 2>&1', $output, $rtn);
+
+        if (false === $exec || 0 !== $rtn) {
+            $croppedStderr = self::trimString(implode("\n", $output), 1000);
+
+            throw new OfficeConverterException('Convertion Failure! Contact Server Admin:' . "code $rtn \nerror: $croppedStderr");
         }
-
-        fwrite($pipes[0], $input);
-        fclose($pipes[0]);
-        $stdout = stream_get_contents($pipes[1]);
-        fclose($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[2]);
-        $rtn = proc_close($process);
-
-        return [
-            'stdout' => $stdout,
-            'stderr' => $stderr,
-            'return' => $rtn,
-        ];
     }
 }
