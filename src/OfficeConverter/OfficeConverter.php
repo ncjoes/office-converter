@@ -259,14 +259,12 @@ class OfficeConverter
      *
      * @param string $cmd
      * @param string $input
-     *
-     * @return array
      */
     private function exec($cmd, $input = '')
     {
         // Cannot use $_SERVER superglobal since that's empty during UnitUnishTestCase
         // getenv('HOME') isn't set on Windows and generates a Notice.
-        if ($this->prefixExecWithExportHome) {
+        if ($this->prefixExecWithExportHome && false === stripos(PHP_OS, 'WIN')) {
             $home = getenv('HOME');
             if (!is_writable($home)) {
                 $cmd = 'export HOME=/tmp && '.$cmd;
