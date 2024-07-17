@@ -48,7 +48,7 @@ class OfficeConverter
         $supportedExtensions = $this->getAllowedConverter($this->extension);
 
         if (!in_array($outputExtension, $supportedExtensions)) {
-            throw new OfficeConverterException("Output extension({$outputExtension}) not supported for input file({$this->basename})");
+            throw new OfficeConverterException("Output extension ($outputExtension) not supported for input file($this->basename)");
         }
 
         $outdir = $this->tempPath;
@@ -59,9 +59,11 @@ class OfficeConverter
 
     protected static function trimString($value, $limit = 200, $end = '...')
     {
-        return (mb_strwidth($value, 'UTF-8') <= $limit) ? $value : rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
+        return (mb_strwidth($value, 'UTF-8') <= $limit)
+            ? $value
+            : rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')) . $end;
     }
-    
+
     /**
      * @param string $filename
      *
@@ -72,7 +74,7 @@ class OfficeConverter
     protected function open($filename)
     {
         if (!file_exists($filename) || false === realpath($filename)) {
-            throw new OfficeConverterException('File does not exist --'.$filename);
+            throw new OfficeConverterException('File does not exist --' . $filename);
         }
 
         $this->file = realpath($filename);
@@ -99,7 +101,7 @@ class OfficeConverter
 
         //Check for valid input file extension
         if (!array_key_exists($extension, $this->getAllowedConverter())) {
-            throw new OfficeConverterException('Input file extension not supported -- '.$extension);
+            throw new OfficeConverterException('Input file extension not supported -- ' . $extension);
         }
         $this->extension = $extension;
 
@@ -134,14 +136,14 @@ class OfficeConverter
     {
         $oriFile = escapeshellarg($this->file);
         $outputDirectory = escapeshellarg($outputDirectory);
-        $logCmd = $this->logPath ? ">> {$this->logPath}" : "";
+        $logCmd = $this->logPath ? ">> {$this->logPath}" : '';
 
         $randomNumber = mt_rand(1, 20);
 
         // Add the userInstallationDirectory option
         $userInstallationDirectoryOption = "-env:UserInstallation=file://{$_SERVER['HOME']}/.config/libreoffice-profile{$randomNumber}";
 
-        return "{$this->bin} --headless --convert-to {$outputExtension}{$this->filter} {$userInstallationDirectoryOption} {$oriFile} --outdir {$outputDirectory}";
+        return "\"$this->bin\" --headless --convert-to {$outputExtension}{$this->filter} $userInstallationDirectoryOption $oriFile --outdir $outputDirectory";
     }
 
     /**
@@ -149,9 +151,10 @@ class OfficeConverter
      *
      * @return OfficeConverter
      */
-    public function setFilter ($filter)
+    public function setFilter($filter)
     {
-        $this->filter = ":" . $filter;
+        $this->filter = ':' . $filter;
+
         return $this;
     }
 
@@ -165,11 +168,13 @@ class OfficeConverter
     protected function prepOutput($outdir, $filename, $outputExtension)
     {
         $DS = DIRECTORY_SEPARATOR;
-        $tmpName = ($this->extension ? basename($this->basename, $this->extension) : $this->basename . '.').$outputExtension;
-        if (rename($outdir.$DS.$tmpName, $outdir.$DS.$filename)) {
-            return $outdir.$DS.$filename;
-        } elseif (is_file($outdir.$DS.$tmpName)) {
-            return $outdir.$DS.$tmpName;
+        $tmpName = ($this->extension ? basename($this->basename, $this->extension) : $this->basename . '.') . $outputExtension;
+        if (rename($outdir . $DS . $tmpName, $outdir . $DS . $filename)) {
+            return $outdir . $DS . $filename;
+        }
+
+        if (is_file($outdir . $DS . $tmpName)) {
+            return $outdir . $DS . $tmpName;
         }
 
         return null;
@@ -236,9 +241,9 @@ class OfficeConverter
             'Jpg' => ['pdf'],
             'Jpeg' => ['pdf'],
             'Jfif' => ['pdf'],
-            'rtf'  => ['docx', 'txt', 'pdf'],
-            'txt'  => ['pdf', 'odt', 'doc', 'docx', 'html'],
-            'csv'  => ['pdf'],
+            'rtf' => ['docx', 'txt', 'pdf'],
+            'txt' => ['pdf', 'odt', 'doc', 'docx', 'html'],
+            'csv' => ['pdf'],
         ];
 
         if (null !== $extension) {
@@ -267,7 +272,7 @@ class OfficeConverter
         if ($this->prefixExecWithExportHome && false === stripos(PHP_OS, 'WIN')) {
             $home = getenv('HOME');
             if (!is_writable($home)) {
-                $cmd = 'export HOME=/tmp && '.$cmd;
+                $cmd = 'export HOME=/tmp && ' . $cmd;
             }
         }
 
