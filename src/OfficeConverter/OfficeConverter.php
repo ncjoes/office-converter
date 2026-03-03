@@ -138,12 +138,7 @@ class OfficeConverter
         $outputDirectory = escapeshellarg($outputDirectory);
         $logCmd = $this->logPath ? ">> {$this->logPath}" : '';
 
-        $randomNumber = mt_rand(1, 20);
-
-        // Add the userInstallationDirectory option
-        $userInstallationDirectoryOption = "-env:UserInstallation=file://{$_SERVER['HOME']}/.config/libreoffice-profile{$randomNumber}";
-
-        return "\"$this->bin\" --headless --convert-to {$outputExtension}{$this->filter} $userInstallationDirectoryOption $oriFile --outdir $outputDirectory";
+        return "\"$this->bin\" --headless --convert-to {$outputExtension}{$this->filter} $oriFile --outdir $outputDirectory";
     }
 
     /**
