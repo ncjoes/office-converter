@@ -136,9 +136,10 @@ class OfficeConverter
     {
         $oriFile = escapeshellarg($this->file);
         $outputDirectory = escapeshellarg($outputDirectory);
-        $logCmd = $this->logPath ? ">> {$this->logPath}" : '';
+        $bin = escapeshellarg($this->bin);
+        $convertTo = escapeshellarg($outputExtension . $this->filter);
 
-        return "\"$this->bin\" --headless --convert-to {$outputExtension}{$this->filter} $oriFile --outdir $outputDirectory";
+        return "$bin --headless --convert-to $convertTo $oriFile --outdir $outputDirectory";
     }
 
     /**
